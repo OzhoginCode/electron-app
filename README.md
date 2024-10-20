@@ -1,23 +1,21 @@
 # electron-app
 
-An Electron application with React
+Приложение на electron-vite, позволяющее добавлять пользователей в таблицу и просматривать их
 
-## Recommended IDE Setup
+## Настройка проекта
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+Требования: node, make
 
-## Project Setup
-
-### Install
+### Установка
 
 ```bash
-$ npm install
+make install
 ```
 
-### Development
+### Разработка
 
 ```bash
-$ npm run dev
+make dev
 ```
 
 ### Build
