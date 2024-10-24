@@ -37,6 +37,31 @@ function createWindow() {
   }
 }
 
+let newUserWindow;
+
+function createNewUserWindow() {
+  newUserWindow = new BrowserWindow({
+    width: 400,
+    height: 600,
+    show: false,
+    autoHideMenuBar: true,
+    webPreferences: {
+      preload: join(__dirname, '../preload/index.js'),
+      sandbox: false,
+    },
+  });
+
+  newUserWindow.on('ready-to-show', () => {
+    newUserWindow.show();
+  });
+
+  if (is.dev && process.env.ELECTRON_RENDERER_URL) {
+    newUserWindow.loadURL(`${process.env.ELECTRON_RENDERER_URL}/new-user-form`);
+  } else {
+    newUserWindow.loadFile(join(__dirname, '../renderer/new-user-form.html'));
+  }
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -64,7 +89,21 @@ app.whenReady().then(() => {
   ipcMain.handle('add-user', (_event, userData) => {
     const newUser = { ...userData, id: users.length + 1 };
     users.push(newUser);
+
+    if (newUserWindow) {
+      newUserWindow.close();
+      newUserWindow = null;
+    }
+
+    const [, mainWindow] = BrowserWindow.getAllWindows();
+
+    mainWindow.webContents.send('user-added', newUser);
+
     return newUser;
+  });
+
+  ipcMain.handle('open-new-user-window', () => {
+    createNewUserWindow();
   });
 
   createWindow();

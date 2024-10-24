@@ -1,23 +1,29 @@
 import { useState, useEffect } from 'react';
-
 import UsersTable from './components/UsersTable';
-import NewUserForm from './components/NewUserForm';
+import NewUserButton from './components/NewUserButton';
 
 const App = () => {
   const [users, setUsers] = useState([]);
+
   useEffect(() => {
     window.electron.ipcRenderer.invoke('get-users').then(setUsers);
   }, []);
 
-  const addNewUser = (userData) => {
-    window.electron.ipcRenderer
-      .invoke('add-user', userData)
-      .then((newUser) => setUsers([...users, newUser]));
-  };
+  useEffect(() => {
+    const userAddedListener = (_event, newUser) => {
+      setUsers((prevUsers) => [...prevUsers, newUser]);
+    };
+
+    window.electron.ipcRenderer.on('user-added', userAddedListener);
+
+    return () => {
+      window.electron.ipcRenderer.removeListener('user-added', userAddedListener);
+    };
+  }, []);
 
   return (
     <>
-      <NewUserForm addNewUser={addNewUser} />
+      <NewUserButton />
       <UsersTable users={users} />
     </>
   );
